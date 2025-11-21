@@ -1,5 +1,7 @@
 [build-system]
-requires = ["setuptools>=80.9.0"]
+requires = [
+    "setuptools>=80.9.0",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -18,7 +20,8 @@ dependencies = [
     "questionary>=2.1.1",
     "returns[compatible-mypy]>=0.26.0",
     "h5py>=3.14.0",
-    "typeguard>=4.4.4"
+    "typeguard>=4.4.4",
+    "pywin32;sys_platform == 'win32'",
 ]
 
 [tool.setuptools.package-data]
