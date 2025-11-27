@@ -5,8 +5,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gixpes"
-version = "0.1.1"
+name = "gixps"
+version = "25.11.27"
 authors = [
     { name="David Capalbo", email="david.capalbo@uni-konstanz.de" }
 ]
@@ -25,4 +25,4 @@ dependencies = [
 ]
 
 [tool.setuptools.package-data]
-"gixpes" = ["templates/files/*.py"]
+"gixps" = ["templates/files/*.py"]
