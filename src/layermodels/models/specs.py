@@ -72,8 +72,8 @@ class MediumSpec(Spec[Medium]):
     material: Material | Auto
     args: Maybe[LayerArgs | Auto]
 
-    def __init__(self, material: str | Material | Auto, args: Optional[LayerArgs | Auto] = None):
-        self.material = material if isinstance(material, (Material, Auto)) else Material.from_str(material)
+    def __init__(self, material: Material | Auto | str | tuple[str, float], args: Optional[LayerArgs | Auto] = None):
+        self.material = material if isinstance(material, (Material, Auto)) else Material.new(material)
         self.args = Some(args) if isinstance(args, (LayerArgs, Auto)) else Nothing
 
 
@@ -81,7 +81,12 @@ class MediumSpec(Spec[Medium]):
 class LayerSpec(MediumSpec):
     thickness: int | Auto
 
-    def __init__(self, thickness: int | Auto, material: str | Material | Auto, args: Optional[LayerArgs | Auto] = None):
+    def __init__(
+        self,
+        thickness: int | Auto,
+        material: Material | Auto | str | tuple[str, float],
+        args: Optional[LayerArgs | Auto] = None,
+    ):
         super().__init__(material, args)
         self.thickness = thickness
 

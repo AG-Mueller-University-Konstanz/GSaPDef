@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Optional
 import re
 
 from returns.pipeline import is_successful as ok
@@ -13,6 +14,14 @@ class Material:
     name: str
     code: str
     composition: dict[str, float]
+    density: float  # in g/cm3
+
+    @classmethod
+    def new(cls, material: str | tuple[str, float]) -> Material:
+        if isinstance(material, str):
+            return cls.from_str(material)
+        else:
+            return cls.from_tuple(material)
 
     @classmethod
     def from_str(cls, code: str) -> Material:
@@ -24,7 +33,15 @@ class Material:
             name="Undefined",
             code=code,
             composition=comp,
+            density=0.0,
         )
+
+    @classmethod
+    def from_tuple(cls, data: tuple[str, float]) -> Material:
+        code, density = data
+        instance = cls.from_str(code)
+        instance.density = density
+        return instance
 
     def validate(self) -> Result[None, Err]:
         MatErr = Err.TypeErr("Material")

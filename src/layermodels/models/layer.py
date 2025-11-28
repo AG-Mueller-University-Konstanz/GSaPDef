@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, Optional
+from typing import Iterable, Optional
 
 from returns.result import Result, Success, Failure
 from returns.pipeline import is_successful as ok
@@ -21,7 +21,7 @@ class LayerArgs:
     x3: Maybe[float] = Nothing  # composition fraction of code3
     sigma: Maybe[float] = Nothing  # rms roughness in Å
     tr: Maybe[float] = Nothing  # transition layer thickness in Å
-    rho: Maybe[float] = Nothing  # material density in ???
+    rho: Maybe[float] = Nothing  # material density in g/cm3
     chi0: Maybe[float] = Nothing  # layer x-ray susceptibility
     deb_wall: Maybe[float] = Nothing  # Debye-Waller factor
 
@@ -59,8 +59,8 @@ class Medium:
     material: Material
     args: Maybe[LayerArgs]
 
-    def __init__(self, material: str | Material, args: Optional[LayerArgs] = None):
-        self.material = material if isinstance(material, Material) else Material.from_str(material)
+    def __init__(self, material: Material | str | tuple[str, float], args: Optional[LayerArgs] = None):
+        self.material = material if isinstance(material, Material) else Material.new(material)
         self.args = Some(args) if isinstance(args, LayerArgs) else Nothing
 
     def __repr__(self) -> str:
@@ -95,7 +95,7 @@ class Substrate(Medium):
 class Layer(Medium):
     thickness: int  # in Å
 
-    def __init__(self, thickness: int, material: Material | str, args: Optional[LayerArgs] = None):
+    def __init__(self, thickness: int, material: Material | str | tuple[str, float], args: Optional[LayerArgs] = None):
         self.thickness = thickness
         super().__init__(material, args)
 
