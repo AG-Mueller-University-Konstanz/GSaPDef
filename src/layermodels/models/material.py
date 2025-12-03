@@ -50,20 +50,26 @@ class Material:
         CompErr = Err.TypeErr("Composition")
         DBErr = Err.TypeErr("Database")
 
-        if self.code == "":
-            return Failure(MatErr("An empty material code ('') was provided."))
+        if self.code == "" and len(self.composition.items()) == 0:
+            return Failure(MatErr("Neither a material code ('') or a composition were provided."))
+
         if not cache.Materials.valid:
             print(cache.Materials.valid)
             return Failure(DBErr("Materials database is could not be checked."))
-        elif self.code not in cache.Materials.store.keys():
+
+        if self.code != "" and self.code not in cache.Materials.store.keys():
             return Failure(
                 DBErr(
                     f"Material code '{self.code}' not found in the materials database, check spelling or either add a density or define it via LayerArgs."
                 )
             )
-        if not self.composition:
+        if len(self.composition.items()) > 0 and not all(
+            el in cache.Materials.store.keys() for el in self.composition.keys()
+        ):
             return Failure(
-                MatErr("Composition could not be identified from code.").stack(CompErr(f"Code: '{self.code}' => empty"))
+                CompErr(
+                    f"One or more elements in the composition {self.composition.keys()} are not found in the materials database."
+                )
             )
 
         return Success(None)
