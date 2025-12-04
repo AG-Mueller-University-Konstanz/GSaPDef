@@ -6,16 +6,9 @@ from .simulation import Simulation
 from ..external.sessa import Orientation, Aperture, Geometry
 from ..external.ter_sl import (
     Form,
-    Polarization,
-    SourceMode,
-    SubstrateMode,
-    SourceConfig,
-    SubstrateConfig,
-    SubstrateSurface,
-    DatabaseMode,
-    ScanConfig,
-    ScanUnits,
-    StandingWaveConfig,
+    Unit as FormUnit,
+    Mode as FormMode,
+    Config as FormCfg,
 )
 
 __all__ = [
@@ -33,6 +26,9 @@ __all__ = [
     "Simulation",
     #
     "Form",
+    "FormUnit",
+    "FormMode",
+    "FormCfg",
     #
     "Orientation",
     "Aperture",
