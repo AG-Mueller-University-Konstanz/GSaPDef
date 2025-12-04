@@ -4,7 +4,19 @@ from .profile import Profile
 from .setup import Setup
 from .simulation import Simulation
 from ..external.sessa import Orientation, Aperture, Geometry
-from ..external.ter_sl import Form
+from ..external.ter_sl import (
+    Form,
+    Polarization,
+    SourceMode,
+    SubstrateMode,
+    SourceConfig,
+    SubstrateConfig,
+    SubstrateSurface,
+    DatabaseMode,
+    ScanConfig,
+    ScanUnits,
+    StandingWaveConfig,
+)
 
 __all__ = [
     "Material",

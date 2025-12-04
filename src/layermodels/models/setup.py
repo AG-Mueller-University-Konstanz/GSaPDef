@@ -9,7 +9,7 @@ from returns.pipeline import is_successful as ok
 from ..error import Error as Err
 from ..printing import indent_block
 from ..external.sessa import Geometry
-from ..external.ter_sl import Form
+from ..external.ter_sl import Form, SourceMode
 from ..models.profile import Profile
 
 
@@ -45,13 +45,13 @@ class Setup:
                 f"Energy: {self.energy}eV",
                 f"{self.profile}",
                 f"{self.geometry}",
-                f"Template: {str(self.ter_template.to_dict())}",
+                f"Template: {str(self.ter_template.parse())}",
             ]
         )
 
     def validate(self) -> Result[None, Err]:
         SetupErr = Err.TypeErr("Setup")
-        
+
         if not self.interface_thickness > 0.0:
             return Failure(SetupErr(f"interface_thickness must be positive, got {self.interface_thickness}."))
 
@@ -73,7 +73,7 @@ class Setup:
         return Success(None)
 
     def fill(self) -> None:
-        self.ter_template.set_energy(self.energy)
+        self.ter_template.source.mode = (SourceMode.ENERGY, self.energy)
         self.ter_template.profile = deepcopy(self.profile)
 
     def hash(self) -> int:
