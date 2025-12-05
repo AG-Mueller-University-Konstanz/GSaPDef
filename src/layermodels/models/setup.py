@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from copy import deepcopy
 from hashlib import sha256
 from struct import unpack
+from typing import cast
 
 from returns.result import Result, Success, Failure
 from returns.pipeline import is_successful as ok
@@ -9,7 +10,8 @@ from returns.pipeline import is_successful as ok
 from ..error import Error as Err
 from ..printing import indent_block
 from ..external.sessa import Geometry
-from ..external.ter_sl import Form, SourceMode
+from ..external.ter_sl import Form, Mode as FormMode
+from ..models.layer import Substrate
 from ..models.profile import Profile
 
 
@@ -73,7 +75,17 @@ class Setup:
         return Success(None)
 
     def fill(self) -> None:
-        self.ter_template.source.mode = (SourceMode.ENERGY, self.energy)
+        if self.ter_template.source.mode[0] == FormMode.Source.AUTO:
+            self.ter_template.source.mode = (FormMode.Source.ENERGY, self.energy)
+        if self.ter_template.substrate.mode[0] == FormMode.Substrate.AUTO:
+            substrate = cast(Substrate, self.profile.layers[-1])
+            if substrate.material.density > 0.0:
+                self.ter_template.substrate.mode = (
+                    FormMode.Substrate.CHEMICAL,
+                    (substrate.material.code, substrate.material.density),
+                )
+            else:
+                self.ter_template.substrate.mode = (FormMode.Substrate.CODE, substrate.material.code)
         self.ter_template.profile = deepcopy(self.profile)
 
     def hash(self) -> int:
