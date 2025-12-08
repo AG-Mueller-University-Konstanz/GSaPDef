@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -23,14 +23,25 @@ class Simulation:
     peaks_grouped_filtered: Dict[str, NDArray[np.bool]] = field(default_factory=dict)
     grid: Grid = field(default_factory=Grid)
     damping_tensor: NDArray[np.float64] = field(default_factory=lambda: np.array([]))  # (angle, depth, peak)
-    damping_map: Dict[str, Dict[str, NDArray[np.float64]]] = field(
-        default_factory=dict
-    )  # element (Peak) -> damping 2D array (angle, depth)
+    #
     damped_tensor: NDArray[np.float64] = field(default_factory=lambda: np.array([]))  # (angle, depth, peak)
     rocking_matrix: NDArray[np.float64] = field(default_factory=lambda: np.array([]))  # (angle, peak)
     sensitivity_tensor: NDArray[np.int32] = field(
         default_factory=lambda: np.array([])
     )  # (angle, (layer, intervals), peak)
+    #
+    result_dict: Dict[
+        str,  # element
+        Dict[
+            str,  # orbital
+            Tuple[
+                NDArray[np.float64],  # damping matrix (angle, depth)
+                NDArray[np.float64],  # damped matrix (angle, depth)
+                NDArray[np.float64],  # rocking array (angle)
+                NDArray[np.int32],  # sensitivity matrix (angle, (layer, intervals))
+            ],
+        ],
+    ] = field(default_factory=dict)
 
     def __init__(self, id: int, setup: Setup):
         self.id = id
@@ -42,10 +53,24 @@ class Simulation:
         self.peaks_grouped_filtered = {}
         self.grid = Grid()
         self.damping = np.array([])
-        self.damping_map = {}
-        self.results = np.array([])
+        self.result_dict = {}
 
     @classmethod
     def from_list(cls, setups: list[Setup]) -> list[Simulation]:
         start_id = Cache.State.start_run
         return [cls(id=start_id + i, setup=setup) for i, setup in enumerate(setups)]
+
+    def init_dict(self) -> None:
+        peaks = [peak for i, peak in enumerate(self.peaks) if self.peaks_filtered[i]]
+
+        self.result_dict = {
+            peak.element: {
+                peak.trans: (
+                    self.damping_tensor[:, :, i],
+                    self.damped_tensor[:, :, i],
+                    self.rocking_matrix[:, i],
+                    self.sensitivity_tensor[:, :, :, i],
+                )
+            }
+            for i, peak in enumerate(peaks)
+        }
