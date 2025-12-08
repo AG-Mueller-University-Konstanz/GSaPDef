@@ -57,12 +57,13 @@ class Material:
             print(cache.Materials.valid)
             return Failure(DBErr("Materials database is could not be checked."))
 
-        if self.code != "" and self.code not in cache.Materials.store.keys():
+        if self.density == 0.0 and self.code != "" and self.code not in cache.Materials.store.keys():
             return Failure(
                 DBErr(
                     f"Material code '{self.code}' not found in the materials database, check spelling or either add a density or define it via LayerArgs."
                 )
             )
+
         if len(self.composition.items()) > 0 and not all(
             el in cache.Materials.store.keys() for el in self.composition.keys()
         ):
