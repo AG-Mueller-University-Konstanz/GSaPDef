@@ -114,14 +114,22 @@ class Medium:
 
     def validate(self) -> Result[Maybe[Warn], Err]:
         MedErr = Err.TypeErr("Medium")
-        if not ok(mat_res := self.material.validate()):
-            return Failure(MedErr("field material").stack(mat_res.failure()))
 
         if self.args != Nothing:
-            if not ok(arg_res := self.args.unwrap().validate()):
-                return Failure(MedErr("field args").stack(arg_res.failure()))
-            if ok(arg_res) and (warn := arg_res.unwrap()) != Nothing:
+            if not ok(arg_check := self.args.unwrap().validate()):
+                return Failure(MedErr("field args").stack(arg_check.failure()))
+            if ok(arg_check) and (warn := arg_check.unwrap()) != Nothing:
                 return Success(Some(warn.unwrap()))
+
+        if not ok(mat_check := self.material.validate()):
+            if not isinstance(mat_check.failure(), Err.TypeErr("Database")):
+                return Failure(MedErr("field material").stack(mat_check.failure()))
+            else:
+                if self.args == Nothing:  # TODO check if composition provided via LayerArgs is valid
+                    return Failure(MedErr("field material").stack(mat_check.failure()))
+                else:
+                    return Success(Some(mat_check.failure().msg))
+
         return Success(Nothing)
 
 
