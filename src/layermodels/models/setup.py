@@ -76,7 +76,8 @@ class Setup:
 
     def fill(self) -> None:
         if self.ter_template.source.mode[0] == FormMode.Source.AUTO:
-            self.ter_template.source.mode = (FormMode.Source.ENERGY, self.energy)
+            self.ter_template.source.mode = (FormMode.Source.WAVELENGTH, 12.398419739640716 / (self.energy / 1e3))
+
         if self.ter_template.substrate.mode[0] == FormMode.Substrate.AUTO:
             substrate = cast(Substrate, self.profile.layers[-1])
             if substrate.material.density > 0.0:
