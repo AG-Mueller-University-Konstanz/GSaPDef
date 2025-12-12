@@ -16,9 +16,6 @@ from .specs import (
     MultiLayerSpec as MultiLayer,
     ProfileSpec as Profile,
     SetupSpec as Setup,
-    GeometrySpec as Geometry,
-    OrientationSpec as Orientation,
-    ApertureSpec as Aperture,
 )
 
 __all__ = [
@@ -41,8 +38,4 @@ __all__ = [
     "FormUnit",
     "FormMode",
     "FormCfg",
-    #
-    "Orientation",
-    "Aperture",
-    "Geometry",
 ]

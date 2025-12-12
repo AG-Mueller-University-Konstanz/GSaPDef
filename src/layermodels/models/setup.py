@@ -9,7 +9,6 @@ from returns.pipeline import is_successful as ok
 
 from ..error import Error as Err
 from ..printing import indent_block
-from ..external.sessa import Geometry
 from ..external.ter_sl import Form, Mode as FormMode
 from ..models.layer import Substrate
 from ..models.profile import Profile
@@ -17,10 +16,10 @@ from ..models.profile import Profile
 
 @dataclass
 class Setup:
-    interface_thickness: float = field(default=0.0)  # in Angstroms
+    interface_thickness: float = field(default=2.5)  # in Angstroms
     energy: float = field(default=6000.0)  # in eV
+    collection_angle: float = field(default=90.0)  # in degrees
     profile: Profile = field(default_factory=Profile)
-    geometry: Geometry = field(default_factory=Geometry)
     ter_template: Form = field(default_factory=Form)
 
     def __repr__(self) -> str:
@@ -31,8 +30,8 @@ class Setup:
                     "\n".join(
                         [
                             f"Energy: {self.energy}eV",
+                            f"Collection Angle: {self.collection_angle}",
                             f"{self.profile}",
-                            f"{self.geometry}",
                             f"{self.ter_template}",
                         ]
                     ),
@@ -45,8 +44,8 @@ class Setup:
         return "\n".join(
             [
                 f"Energy: {self.energy}eV",
+                f"Collection Angle: {self.collection_angle}",
                 f"{self.profile}",
-                f"{self.geometry}",
                 f"Template: {str(self.ter_template.parse())}",
             ]
         )
@@ -60,11 +59,11 @@ class Setup:
         if not 50 <= self.energy <= 20000:
             return Failure(SetupErr(f"energy must be between 50 and 20000, got {self.energy}. (Enforced by Sessa)"))
 
+        if not 0.0 < self.collection_angle < 180.0:
+            return Failure(SetupErr("collection angle must be between 0 and 180 degrees."))
+
         if not 0.01 <= (wave := round((12.398419739640716 / (self.energy / 1e3)), 6)) <= 1000.0:
             return Failure(SetupErr(f"wavelength must be between 0.01 and 1000.0 Å, got {wave}. (Enforced by TER-SL)"))
-
-        if not ok(geo_res := self.geometry.validate()):
-            return Failure(SetupErr("Invalid geometry.").stack(geo_res.failure()))
 
         if not ok(prof_res := self.profile.validate()):
             return Failure(SetupErr("Invalid profile.").stack(prof_res.failure()))

@@ -109,48 +109,25 @@ class ProfileSpec(Spec[Profile]):
 
 
 @dataclass
-class OrientationSpec(Spec[Orientation]):
-    phi: float | Auto = field(default=0.0)
-    theta: float | Auto = field(default=0.0)
-
-
-@dataclass
-class ApertureSpec(Spec[Aperture]):
-    phi_lower: float | Auto = field(default=0.0)
-    phi_upper: float | Auto = field(default=0.0)
-    theta_lower: float | Auto = field(default=0.0)
-    theta_upper: float | Auto = field(default=0.0)
-
-
-@dataclass
-class GeometrySpec(Spec[Geometry]):
-    aperture: ApertureSpec = field(default_factory=ApertureSpec)
-    orientation_sample: OrientationSpec = field(default_factory=OrientationSpec)
-    orientation_analyzer: OrientationSpec = field(default_factory=OrientationSpec)
-    orientation_source: OrientationSpec = field(default_factory=OrientationSpec)
-    polarization: OrientationSpec = field(default_factory=OrientationSpec)
-
-
-@dataclass
 class SetupSpec(Spec[Setup]):
     interface_thickness: float | Auto  # in Angstroms
     energy: float | Auto  # in eV
+    collection_angle: float | Auto  # in degrees
     profile: ProfileSpec
-    geometry: GeometrySpec = field(default_factory=GeometrySpec)
     ter_template: Form = field(default_factory=Form)
 
     def __init__(
         self,
         interface_thickness: float | Auto,
         energy: float | Auto,
+        collection_angle: float | Auto,
         profile: ProfileSpec,
-        geometry: GeometrySpec = GeometrySpec(),
         ter_template: Form = Form(),
     ):
         self.interface_thickness = interface_thickness
         self.energy = energy
+        self.collection_angle = collection_angle
         self.profile = profile
-        self.geometry = geometry
         self.ter_template = ter_template
 
 
@@ -164,9 +141,6 @@ specmap: dict[type, type] = {
     LayerSpec: Layer,
     MultiLayerSpec: MultiLayer,
     ProfileSpec: Profile,
-    OrientationSpec: Orientation,
-    ApertureSpec: Aperture,
-    GeometrySpec: Geometry,
     SetupSpec: Setup,
 }
 
