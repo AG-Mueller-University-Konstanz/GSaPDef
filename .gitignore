@@ -4,6 +4,7 @@
 !README.md
 !setup.py
 !pyproject.toml
+!setup.cfg
 !cleanup.sh
 !build_install.sh
 !build_install.bat
@@ -16,3 +17,4 @@
 
 !src/
 !src/**/*
+src/**.egg-info
