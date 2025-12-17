@@ -51,7 +51,7 @@ class Layer(Medium):
             errors.append(ExceptionGroup("field material", med_check.failure()))
 
         if not self.thickness > 0:
-            errors.append(ValueError("Thickness must be positive"))
+            errors.append(ValueError(f"Thickness must be positive, got {self.thickness}"))
 
         if errors:
             return Failure(errors)
@@ -72,6 +72,9 @@ class MultiLayer(Section):
                 warnings.extend(layer_check.unwrap())
             else:
                 errors.append(ExceptionGroup(f"field layers[{i}]", layer_check.failure()))
+
+        if not self.repeat >= 1:
+            errors.append(ValueError(f"Repeat must be at least 1, got {self.repeat}"))
 
         if errors:
             return Failure(errors)

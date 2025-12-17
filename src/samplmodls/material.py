@@ -48,7 +48,7 @@ class Material:
             errors.append(ValueError("The material rougthness and transission_thickness mutually exclusive."))
         if self.rougthness > 5.0:
             warns.append(
-                "A high roughness (> 5 Å) may lead to inaccurate results. Use `transission_thickness=2*roughness` instead."
+                f"A high roughness, got {self.rougthness}, (> 5 Å) may lead to inaccurate results. Use `transission_thickness=2*roughness` instead."
             )
 
         comp_type = self.composition_type()
@@ -60,7 +60,11 @@ class Material:
                 )
             )
         if comp_type == CompositionType.WEIGHT_FRACTION and not sum(comp_values) == 1.0:
-            errors.append(ValueError("Element weight fractions must sum to 1.0."))
+            errors.append(
+                ValueError(
+                    f"Element weight fractions must sum to 1.0 for a weight fraction composition, got {sum(comp_values)}."
+                )
+            )
 
         if errors:
             return Failure(errors)
