@@ -44,8 +44,8 @@ class Material:
         errors: List[Exception] = []
         if self.code == "":
             errors.append(ValueError("Material code cannot be empty."))
-        if self.rougthness > 0.0 and self.transission_thickness > 0.0:
-            errors.append(ValueError("The material rougthness and transission_thickness mutually exclusive."))
+        # if self.rougthness > 0.0 and self.transission_thickness > 0.0:
+        #     errors.append(ValueError("The material rougthness and transission_thickness mutually exclusive."))
         if self.rougthness > 5.0:
             warns.append(
                 f"A high roughness, got {self.rougthness}, (> 5 Å) may lead to inaccurate results. Use `transission_thickness=2*roughness` instead."
