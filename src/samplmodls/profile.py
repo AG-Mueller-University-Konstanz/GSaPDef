@@ -3,7 +3,7 @@ from typing import List
 from returns.result import Result, Success, Failure
 from returns.pipeline import is_successful as ok
 
-from .layer import Section, Substrate
+from .layer import Section, Substrate, Layer, MultiLayer
 
 Warning = str
 
@@ -33,3 +33,12 @@ class Profile(list[Section]):
         if errors:
             return Failure(errors)
         return Success(warnings)
+
+    def flatten(self) -> List[Section]:
+        flattened: List[Section] = []
+        for section in self:
+            if isinstance(section, MultiLayer):
+                flattened.extend(section.layers * section.repeat)
+            else:
+                flattened.append(section)
+        return flattened
