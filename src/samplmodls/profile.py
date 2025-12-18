@@ -3,7 +3,7 @@ from typing import List
 from returns.result import Result, Success, Failure
 from returns.pipeline import is_successful as ok
 
-from .layer import Section, Substrate, Layer, MultiLayer
+from .layer import Section, Substrate, MultiLayer
 
 Warning = str
 
@@ -25,7 +25,7 @@ class Profile(list[Section]):
             if isinstance(section, Substrate):
                 has_substrate = True
                 if i != len(self) - 1:
-                    errors.append(ValueError("Substrate must be the last section in the profile."))
+                    errors.append(ValueError(f"Substrate must be the last section in the profile, found @ index {i}."))
 
         if not has_substrate:
             errors.append(ValueError("Profile must contain a substrate section."))
