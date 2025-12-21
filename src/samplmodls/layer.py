@@ -22,6 +22,9 @@ class Section:
     """
 
     def validate(self) -> Result[List[Warning], List[Exception]]:
+        """
+        Abstract method to validate the section's attributes.
+        """
         raise NotImplementedError("Subclasses must implement the validate method.")
 
 
@@ -31,11 +34,13 @@ class Medium(Section):
 
     Attributes
     ----------
-    material: Material
+    material : Material
         The material associated with this medium.
 
     Methods
     -------
+    __init__(material: Material | tuple[str, float]) -> None:
+        Initialize a Medium instance.
     validate() -> Result[List[Warning], List[Exception]]:
         Validates the medium's material, returning warnings or errors as appropriate.
 
@@ -48,6 +53,14 @@ class Medium(Section):
     material: Material
 
     def __init__(self, material: Material | tuple[str, float]) -> None:
+        """
+        Initialize a Medium instance.
+
+        Parameters
+        ----------
+        material: Material | tuple[str, float]
+            The material of the medium, either as a Material instance or a (code, density) tuple.
+        """
         match material:
             case Material():
                 self.material = material
