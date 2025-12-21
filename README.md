@@ -1,5 +1,9 @@
 # GenSamplDef : Generic Sample Definitions
 
+## Pending Renaming
+
+- GSaPDef: Generic Sample and Profile Definitions
+
 `GenSamplDef` is a simple and flexible framework for defining and working with generic sample/profile models in a scientific context in Python. 
 It allows users to define models using a straightforward syntax to represent real world experimental setups for simulations and data analysis.
 
