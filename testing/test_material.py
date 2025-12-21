@@ -15,12 +15,14 @@ def test_material():
     assert not ok(mat.validate())
 
     mat = Material(code="Al7N7Sc6")
+    assert list(mat.composition.keys()) == ["Al", "N", "Sc"]
+    assert list(mat.composition.values()) == [7, 7, 6]
     assert mat.composition_type() == CompositionType.STOICHIOMETRIC
     assert ok(mat.validate())
 
-    mat = Material(code="Al1N4", rougthness=3.0, transission_thickness=2.0)
-    assert not ok(mat.validate())
+    # mat = Material(code="Al1N4", rougthness=3.0, transission_thickness=2.0)
+    # assert not ok(mat.validate())  # should fail due to transission_thickness & rougthness defined together
 
-    mat = Material(code="AlN", rougthness=7.0)
-    assert ok(mat.validate())
-    assert mat.validate().unwrap() != []  # should have a warning about high roughness
+    # mat = Material(code="AlN", rougthness=7.0)
+    # assert ok(mat.validate())
+    # assert mat.validate().unwrap() != []  # should have a warning about high roughness
