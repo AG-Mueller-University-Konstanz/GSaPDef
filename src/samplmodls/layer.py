@@ -24,6 +24,11 @@ class Section:
     def validate(self) -> Result[List[Warning], List[Exception]]:
         """
         Abstract method to validate the section's attributes.
+
+        Raises
+        ------
+        NotImplementedError
+            If the method is not implemented in a subclass.
         """
         raise NotImplementedError("Subclasses must implement the validate method.")
 
