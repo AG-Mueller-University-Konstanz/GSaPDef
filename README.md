@@ -1,10 +1,6 @@
-# GenSamplDef : Generic Sample Definitions
+# GSaPDef : Generic Sample and Profile Definitions
 
-## Pending Renaming
-
-- GSaPDef: Generic Sample and Profile Definitions
-
-`GenSamplDef` is a simple and flexible framework for defining and working with generic sample/profile models in a scientific context in Python. 
+`GSaPDef` is a simple and flexible framework for defining and working with generic sample/profile models in a scientific context in Python. 
 It allows users to define models using a straightforward syntax to represent real world experimental setups for simulations and data analysis.
 
 ## Features
@@ -29,11 +25,11 @@ You can either:
 ## Build from source
 By cloning the repository and building it locally (requires the package `build`).
 ```bash
-git clone <repository_url>
-cd GenSamplDef
+git clone <repository_url> GSaPDef
+cd GSaPDef
 python -m build
 ```
 Using the generated distribution files in the `dist/` folder, you can install the package via pip:
 ```bash
-pip install dist/gensampldef-<version>-py3-none-any.whl
+pip install dist/gsapdef-<version>-py3-none-any.whl
 ```

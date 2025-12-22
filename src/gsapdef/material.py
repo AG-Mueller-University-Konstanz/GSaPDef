@@ -62,10 +62,6 @@ class Material:
     """Density of the material in g/cm^3."""
     composition: Dict[str, float] = field(init=False)
     """Init generated dictionary mapping element symbols to their ratios/fractions."""
-    # rougthness: float = field(default=0.0)  # in nm
-    # transission_thickness: float = field(default=0.0)  # thickness of transition layer in nm
-    # susceptibility: float = field(default=0.0)  # dimensionless
-    # deb_waller_factor: float = field(default=1.0)  # dimensionless
 
     def __post_init__(self) -> None:
         """
@@ -84,7 +80,9 @@ class Material:
         comp_values = list(self.composition.values())
         if all(map(lambda x: 0.0 < x < 1.0, comp_values)):
             return CompositionType.WEIGHT_FRACTION
-        elif all(map(lambda x: x % 1 == 0.0, comp_values)) and all(map(lambda x: int(x) >= 1, comp_values)):
+        elif all(map(lambda x: x % 1 == 0.0, comp_values)) and all(
+            map(lambda x: int(x) >= 1, comp_values)
+        ):
             return CompositionType.STOICHIOMETRIC
         else:
             return CompositionType.UNKNOWN
@@ -118,13 +116,6 @@ class Material:
         if self.density < 0.0:
             errors.append(ValueError("Material density cannot be negative."))
 
-        # if self.rougthness > 0.0 and self.transission_thickness > 0.0:
-        #     errors.append(ValueError("The material rougthness and transission_thickness mutually exclusive."))
-        # if self.rougthness > 5.0:
-        #     warns.append(
-        #         f"A high roughness, got {self.rougthness}, (> 5 Å) may lead to inaccurate results. Use `transission_thickness=2*roughness` instead."
-        #     )
-
         comp_type = self.composition_type()
         comp_values = list(self.composition.values())
         if comp_type == CompositionType.UNKNOWN:
@@ -133,7 +124,10 @@ class Material:
                     "Element fractions must be between 0 and 1 for weight fractions or integers >= 1 for stoichiometric ratios."
                 )
             )
-        if comp_type == CompositionType.WEIGHT_FRACTION and not round(sum(comp_values), 6) == 1.0:
+        if (
+            comp_type == CompositionType.WEIGHT_FRACTION
+            and not round(sum(comp_values), 6) == 1.0
+        ):
             errors.append(
                 ValueError(
                     f"Element weight fractions must sum to 1.0 for a weight fraction composition, got {sum(comp_values)}."
