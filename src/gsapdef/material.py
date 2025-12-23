@@ -51,9 +51,9 @@ class Material:
 
     Examples
     --------
-    >>> mat = Material(code="Al0.35N0.35Sc0.3", density=3.5678)
-    >>> mat = Material(code="AlNSc", density=3.5678)
-    >>> mat = Material(code="Al7N7Sc6", density=3.5678)
+    >>> mat = Material(code="Al0.35/N0.35/Sc0.3", density=3.5678)
+    >>> mat = Material(code="Al/N/Sc", density=3.5678)
+    >>> mat = Material(code="Al7/N7/Sc6", density=3.5678)
     """
 
     code: str
@@ -66,12 +66,8 @@ class Material:
     def __post_init__(self) -> None:
         """
         Generate the `composition` dictionary from the `code` string after initialization.
-
-        Elements without specified values default to 1.0.
         """
-        pattern = re.compile(r"([A-Z][a-z]?)(\d*\.?\d*)?")
-        matches = pattern.findall(self.code)
-        self.composition = {str(el): float(num) if num else 1.0 for el, num in matches}
+        self.composition = get_components(self.code)
 
     def composition_type(self) -> CompositionType:
         """
@@ -137,3 +133,26 @@ class Material:
         if errors:
             return Failure(errors)
         return Success(warns)
+
+
+def get_components(code: str) -> Dict[str, float]:
+    """
+    Utility function to extract components from a material code string.
+
+    Parameters
+    ----------
+    code : str
+        Material code string.
+
+    Returns
+    -------
+    Dict[str, float]
+        Dictionary mapping element symbols to their stoichiometric ratios or weight fractions.
+
+    Notes
+    -----
+    Elements without specified values default to 1.0.
+    """
+    pattern = re.compile(r"([A-Za-z]+)(\d*\.?\d*)?")
+    matches = pattern.findall(code)
+    return {str(el): float(num) if num else 1.0 for el, num in matches}
