@@ -1,7 +1,7 @@
 from returns.pipeline import is_successful as ok
 
-from samplmodls import Material, Layer, MultiLayer
-from samplmodls.layer import Medium
+from gsapdef import Material, Layer, MultiLayer
+from gsapdef.layer import Medium
 
 
 def test_Medium():

@@ -1,6 +1,6 @@
 from returns.pipeline import is_successful as ok
 
-from samplmodls import Material, Substrate, Layer, MultiLayer, Profile
+from gsapdef import Material, Substrate, Layer, MultiLayer, Profile
 
 
 def test_profile():
@@ -19,7 +19,9 @@ def test_profile():
         ]
     )
     assert ok(valid_instance.validate())
-    assert len(valid_instance.flatten()) == 2 + 4 * 2 + 1  # 2 Layers + 4*2 MultiLayer + 1 Substrate
+    assert (
+        len(valid_instance.flatten()) == 2 + 4 * 2 + 1
+    )  # 2 Layers + 4*2 MultiLayer + 1 Substrate
 
     invalid_instance = Profile([])
     assert not ok(invalid_instance.validate())
