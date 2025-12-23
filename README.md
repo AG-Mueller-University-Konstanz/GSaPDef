@@ -15,7 +15,7 @@ Currently the package supports various datatypes including:
 
 Additionally, the package provides functionality to:
 - Validate the defined models and their parameters
-- WIP: Serialize and deserialize models to/from common formats (e.g., txt, JSON)
+- Planned: Serialize and deserialize models to/from common formats (e.g., txt, JSON)
 
 ## Installation
 
