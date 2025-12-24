@@ -23,23 +23,26 @@ def test_profile():
         len(valid_instance.flatten()) == 2 + 4 * 2 + 1
     )  # 2 Layers + 4*2 MultiLayer + 1 Substrate
 
-    invalid_instance = Profile([])
-    assert not ok(invalid_instance.validate())
+    assert not ok(Profile([]).validate())
 
-    invalid_instance = Profile(
-        [
-            Layer(material=Material(code="Al"), thickness=10.0),
-            Substrate(material=Material(code="Si")),
-            Layer(material=Material(code="Ti"), thickness=5.0),  # Layer after Substrate
-        ]
+    assert not ok(
+        Profile(
+            [
+                Layer(material=Material(code="Al"), thickness=10.0),
+                Substrate(material=Material(code="Si")),
+                Layer(
+                    material=Material(code="Ti"), thickness=5.0
+                ),  # Layer after Substrate
+            ]
+        ).validate()
     )
-    assert not ok(invalid_instance.validate())
 
-    invalid_instance = Profile(
-        [
-            Layer(material=Material(code="Al"), thickness=10.0),
-            Layer(material=Material(code="Ti"), thickness=5.0),
-            # Missing Substrate
-        ]
+    assert not ok(
+        Profile(
+            [
+                Layer(material=Material(code="Al"), thickness=10.0),
+                Layer(material=Material(code="Ti"), thickness=5.0),
+                # Missing Substrate
+            ]
+        ).validate()
     )
-    assert not ok(invalid_instance.validate())

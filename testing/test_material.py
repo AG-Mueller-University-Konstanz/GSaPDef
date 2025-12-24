@@ -20,24 +20,15 @@ def test_material_composition():
 
 
 def test_material():
+    # test weight fraction composition
     mat = Material(code="Al0.5N0.5")
-    assert list(mat.composition.keys()) == ["Al", "N"]
-    assert list(mat.composition.values()) == [0.5, 0.5]
     assert mat.composition_type() == CompositionType.WEIGHT_FRACTION
     assert ok(mat.validate())
 
-    mat = Material(code="Al0.6N0.6")
-    assert not ok(mat.validate())
-
+    # test stoichiometric composition
     mat = Material(code="Al7N7Sc6")
-    assert list(mat.composition.keys()) == ["Al", "N", "Sc"]
-    assert list(mat.composition.values()) == [7, 7, 6]
     assert mat.composition_type() == CompositionType.STOICHIOMETRIC
     assert ok(mat.validate())
 
-    # mat = Material(code="Al1N4", rougthness=3.0, transission_thickness=2.0)
-    # assert not ok(mat.validate())  # should fail due to transission_thickness & rougthness defined together
-
-    # mat = Material(code="AlN", rougthness=7.0)
-    # assert ok(mat.validate())
-    # assert mat.validate().unwrap() != []  # should have a warning about high roughness
+    assert not ok(Material(code="Al0.6N0.6").validate())  # invalid weight fractions sum
+    assert not ok(Material(code="AlNSc", density=-2.0).validate())  # invalid density

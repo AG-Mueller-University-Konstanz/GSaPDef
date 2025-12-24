@@ -5,14 +5,16 @@ from gsapdef.layer import Medium
 
 
 def test_Medium():
-    assert ok(Medium(material=Material(code="Si")).validate())
-    assert ok(Medium(material=("Si", 2.33)).validate())
+    assert ok(Medium(material=Material(code="Si", density=2.33)).validate())
 
 
 def test_layer():
-    assert ok(Layer(material=Material(code="Al"), thickness=10.0).validate())
-    assert ok(Layer(material=("Al", 2.699), thickness=100.0).validate())
-    assert not ok(Layer(material=Material(code="Al"), thickness=-5.0).validate())
+    assert ok(
+        Layer(material=Material(code="Al", density=2.699), thickness=10.0).validate()
+    )
+    assert not ok(
+        Layer(material=Material(code="Al", density=2.699), thickness=-5.0).validate()
+    )  # invalid thickness
 
 
 def test_multilayer():
