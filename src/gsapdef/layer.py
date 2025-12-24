@@ -44,35 +44,15 @@ class Medium(Section):
 
     Methods
     -------
-    __init__(material: Material | tuple[str, float]) -> None:
-        Initialize a Medium instance.
     validate() -> Result[List[Warning], List[Exception]]:
         Validates the medium's material, returning warnings or errors as appropriate.
 
     Examples
     --------
     >>> med = Medium(material=Material(code="Si", density=2.33))
-    >>> med = Medium(material=("Si", 2.33))
     """
 
     material: Material
-
-    def __init__(self, material: Material | tuple[str, float]) -> None:
-        """
-        Initialize a Medium instance.
-
-        Parameters
-        ----------
-        material: Material | tuple[str, float]
-            The material of the medium, either as a Material instance or a (code, density) tuple.
-        """
-        match material:
-            case Material():
-                self.material = material
-            case (code, density):
-                self.material = Material(code=code, density=density)
-            case _:
-                raise TypeError("material must be a Material instance or a (code, density) tuple")
 
     def validate(self) -> Result[List[Warning], List[Exception]]:
         """
@@ -109,7 +89,6 @@ class Substrate(Medium):
     Examples
     --------
     >>> substrate = Substrate(material=Material(code="Si", density=2.33))
-    >>> substrate = Substrate(material=("Si", 2.33))
     """
 
     pass
@@ -127,37 +106,16 @@ class Layer(Medium):
 
     Methods
     -------
-    __init__(material: Material | tuple[str, float], thickness: float) -> None:
-        Initialize a Layer instance.
     validate() -> Result[List[Warning], List[Exception]]:
         Validates the layer's material and thickness, returning warnings or errors as appropriate.
 
     Examples
     --------
     >>> layer = Layer(material=Material(code="Al", density=2.699), thickness=100.0)
-    >>> layer = Layer(material=("Al", 2.699), thickness=100.0)
     """
 
     thickness: float
     """Thickness of the layer in nanometers (nm)."""
-
-    def __init__(self, material: Material | tuple[str, float], thickness: float) -> None:
-        """
-        Initialize a Layer instance.
-
-        Parameters
-        ----------
-        material: Material | tuple[str, float]
-            The material of the layer, either as a Material instance or a (code, density) tuple.
-        thickness: float
-            Thickness of the layer in nanometers (nm).
-
-        Returns
-        -------
-        None
-        """
-        super(Layer, self).__init__(material=material)
-        self.thickness = thickness
 
     def validate(self) -> Result[List[Warning], List[Exception]]:
         """
@@ -180,10 +138,12 @@ class Layer(Medium):
         if ok(med_check := super(Layer, self).validate()):
             warnings.extend(med_check.unwrap())
         else:
-            errors.append(ExceptionGroup("field material", med_check.failure()))
+            errors.extend(med_check.failure())
 
         if not self.thickness > 0:
-            errors.append(ValueError(f"Thickness must be positive, got {self.thickness}"))
+            errors.append(
+                ValueError(f"Thickness must be positive, got {self.thickness}")
+            )
 
         if errors:
             return Failure(errors)
@@ -244,7 +204,9 @@ class MultiLayer(Section):
             if ok(layer_check := layer.validate()):
                 warnings.extend(layer_check.unwrap())
             else:
-                errors.append(ExceptionGroup(f"field layers[{i}]", layer_check.failure()))
+                errors.append(
+                    ExceptionGroup(f"field layers[{i}]", layer_check.failure())
+                )
 
         if not self.repeat >= 1:
             errors.append(ValueError(f"Repeat must be at least 1, got {self.repeat}"))

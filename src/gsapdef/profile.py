@@ -25,15 +25,15 @@ class Profile(list[Section]):
     --------
     >>> profile = Profile(
     >>>     [
-    >>>         Layer(material=("Al", 2.699), thickness=10.0),
+    >>>         Layer(material=Material("Al", 2.699), thickness=10.0),
     >>>         MultiLayer(
     >>>             layers=[
-    >>>                 Layer(material=("Ni", 8.908), thickness=2.0),
-    >>>                 Layer(material=("Cu", 8.96), thickness=3.0),
+    >>>                 Layer(material=Material("Ni", 8.908), thickness=2.0),
+    >>>                 Layer(material=Material("Cu", 8.96), thickness=3.0),
     >>>             ],
     >>>             repeat=4,
     >>>         ),
-    >>>         Substrate(material=("Si", 2.33)),
+    >>>         Substrate(material=Material("Si", 2.33)),
     >>>     ],
     >>> )
     """
@@ -58,18 +58,28 @@ class Profile(list[Section]):
         errors: List[Exception] = []
 
         if not len(self) >= 2:
-            errors.append(ValueError("Profile must contain at least one layer/multilayer and one substrate."))
+            errors.append(
+                ValueError(
+                    "Profile must contain at least one layer/multilayer and one substrate."
+                )
+            )
 
         has_substrate = False
         for i, section in enumerate(self):
             if ok(sec_check := section.validate()):
                 warnings.extend(sec_check.unwrap())
             else:
-                errors.append(ExceptionGroup(f"field section[{i}]", sec_check.failure()))
+                errors.append(
+                    ExceptionGroup(f"in section @ index {i}", sec_check.failure())
+                )
             if isinstance(section, Substrate):
                 has_substrate = True
                 if i != len(self) - 1:
-                    errors.append(ValueError(f"Substrate must be the last section in the profile, found @ index {i}."))
+                    errors.append(
+                        ValueError(
+                            f"Substrate must be the last section in the profile, found @ index {i}."
+                        )
+                    )
 
         if not has_substrate:
             errors.append(ValueError("Profile must contain a substrate section."))
