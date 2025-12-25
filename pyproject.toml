@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gsapdef"
-version = "25.12.2"
+version = "25.12.3"
 authors = [
     { name="David Capalbo", email="david.capalbo@uni-konstanz.de" }
 ]
