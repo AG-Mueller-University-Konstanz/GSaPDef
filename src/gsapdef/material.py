@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
-import re
-from typing import Dict, List
+from typing import List
 from enum import Enum
 
+from .chem import Formula
+
 from returns.result import Result, Success, Failure
+from returns.pipeline import is_successful as ok
 
 
 Warning = str
@@ -16,7 +18,7 @@ class CompositionType(Enum):
     Attributes:
         UNKNOWN (-1): Composition does not fit any recognized type.
         STOICHIOMETRIC (0): Element ratios are given as integers **>= 1**
-        WEIGHT_FRACTION (1): Element ratios are given as fractions between **0.0** and **1.0**
+        WEIGHT_FRACTION (1): Element ratios are given as fractions between **0.0** and **1.0**. Used to describe a mixture of compounds.
     """
 
     UNKNOWN = -1
@@ -60,28 +62,44 @@ class Material:
     """Unique identifier for the material."""
     density: float = field(default=0.0)
     """Density of the material in g/cm^3."""
-    composition: Dict[str, float] = field(init=False)
+    composition: Result[Formula, Exception] = field(init=False)
     """Init generated dictionary mapping element symbols to their ratios/fractions."""
 
     def __post_init__(self) -> None:
         """
         Generate the `composition` dictionary from the `code` string after initialization.
         """
-        self.composition = get_components(self.code)
+        self.composition = Formula.from_string(self.code)
 
     def composition_type(self) -> CompositionType:
         """
-        Determine the type of composition based on the values in the `composition` dictionary.
+        Determine the type of composition based on the values and state of the `composition` attribute.
+
+        Returns
+        -------
+        CompositionType
+            The type of composition: STOICHIOMETRIC, WEIGHT_FRACTION, or UNKNOWN.
+            - STOICHIOMETRIC: All values can be expressed as non-truncated integers >= 1.
+            - WEIGHT_FRACTION: All values are between 0.0 and 1.0.
+            - UNKNOWN: Values do not fit either category or composition is invalid.
+
+        Notes
+        -----
+        Only checks the first level of the formula; nested groups are not evaluated for composition type.
         """
-        comp_values = list(self.composition.values())
-        if all(map(lambda x: 0.0 < x < 1.0, comp_values)):
-            return CompositionType.WEIGHT_FRACTION
-        elif all(map(lambda x: x % 1 == 0.0, comp_values)) and all(
-            map(lambda x: int(x) >= 1, comp_values)
-        ):
-            return CompositionType.STOICHIOMETRIC
-        else:
+        if not ok(self.composition):
             return CompositionType.UNKNOWN
+        else:
+            formula = self.composition.unwrap()
+            values = list(map(lambda c: c.count, formula))
+            if all(map(lambda x: 0.0 < x < 1.0, values)):
+                return CompositionType.WEIGHT_FRACTION
+            elif all(map(lambda x: x % 1 == 0.0, values)) and all(
+                map(lambda x: int(x) >= 1, values)
+            ):
+                return CompositionType.STOICHIOMETRIC
+            else:
+                return CompositionType.UNKNOWN
 
     def validate(self) -> Result[List[Warning], List[Exception]]:
         """
@@ -112,47 +130,36 @@ class Material:
         if self.density < 0.0:
             errors.append(ValueError("Material density cannot be negative."))
 
-        comp_type = self.composition_type()
-        comp_values = list(self.composition.values())
-        if comp_type == CompositionType.UNKNOWN:
-            errors.append(
-                ValueError(
-                    "Element fractions must be between 0 and 1 for weight fractions or integers >= 1 for stoichiometric ratios."
-                )
-            )
-        if (
-            comp_type == CompositionType.WEIGHT_FRACTION
-            and not round(sum(comp_values), 6) == 1.0
-        ):
-            errors.append(
-                ValueError(
-                    f"Element weight fractions must sum to 1.0 for a weight fraction composition, got {sum(comp_values)}."
-                )
-            )
+        if not ok(self.composition):
+            errors.append(self.composition.failure())
+        else:
+            match self.composition_type():
+                case CompositionType.UNKNOWN:
+                    errors.append(
+                        ValueError(
+                            "Material composition could not be classified as stoichiometric or weight fraction. Check formatting so that all subscripts are either >= 1 (stoichiometric) or between 0 and 1 (weight fraction)."
+                        )
+                    )
+                case CompositionType.STOICHIOMETRIC:
+                    pass  # No additional checks for stoichiometric
+                case CompositionType.WEIGHT_FRACTION:
+                    # TODO: This should be alright, but needs to handle nested groups
+                    formula = self.composition.unwrap()
+                    if len(formula) == 1 and not formula[0].count == 1.0:
+                        errors.append(
+                            ValueError(
+                                "Weight fraction composition with only one element must have a value of 1.0."
+                            )
+                        )
+                    else:
+                        counts = list(map(lambda c: c.count, formula))
+                        if not abs(sum(counts) - 1.0) < 1e-6:
+                            errors.append(
+                                ValueError(
+                                    f"Element weight fractions must sum to 1.0 for a weight fraction composition, got {sum(counts)}."
+                                )
+                            )
 
         if errors:
             return Failure(errors)
         return Success(warns)
-
-
-def get_components(code: str) -> Dict[str, float]:
-    """
-    Utility function to extract components from a material code string.
-
-    Parameters
-    ----------
-    code : str
-        Material code string.
-
-    Returns
-    -------
-    Dict[str, float]
-        Dictionary mapping element symbols to their stoichiometric ratios or weight fractions.
-
-    Notes
-    -----
-    Elements without specified values default to 1.0.
-    """
-    pattern = re.compile(r"([A-Za-z]+)(\d*\.?\d*)?")
-    matches = pattern.findall(code)
-    return {str(el): float(num) if num else 1.0 for el, num in matches}
