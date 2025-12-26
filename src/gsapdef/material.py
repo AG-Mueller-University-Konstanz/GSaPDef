@@ -53,9 +53,9 @@ class Material:
 
     Examples
     --------
-    >>> mat = Material(code="Al0.35/N0.35/Sc0.3", density=3.5678)
-    >>> mat = Material(code="Al/N/Sc", density=3.5678)
-    >>> mat = Material(code="Al7/N7/Sc6", density=3.5678)
+    >>> mat = Material(code="Al0.35N0.35Sc0.3", density=3.5678)
+    >>> mat = Material(code="AlNSc", density=3.5678)
+    >>> mat = Material(code="Al7N7Sc6", density=3.5678)
     """
 
     code: str
@@ -137,7 +137,7 @@ class Material:
                 case CompositionType.UNKNOWN:
                     errors.append(
                         ValueError(
-                            "Material composition could not be classified as stoichiometric or weight fraction. Check formatting so that all subscripts are either >= 1 (stoichiometric) or between 0 and 1 (weight fraction)."
+                            "Material composition could not be classified as either stoichiometric or weighted fractions. Check formatting so that all subscripts are either integers >= 1 (stoichiometric) or floats between 0.0 and 1.0 (weighted fractions)."
                         )
                     )
                 case CompositionType.STOICHIOMETRIC:
@@ -148,7 +148,7 @@ class Material:
                     if len(formula) == 1 and not formula[0].count == 1.0:
                         errors.append(
                             ValueError(
-                                "Weight fraction composition with only one element must have a value of 1.0."
+                                "Weighted fraction subscript for a composition with only one element must have a value of 1.0."
                             )
                         )
                     else:
@@ -156,7 +156,7 @@ class Material:
                         if not abs(sum(counts) - 1.0) < 1e-6:
                             errors.append(
                                 ValueError(
-                                    f"Element weight fractions must sum to 1.0 for a weight fraction composition, got {sum(counts)}."
+                                    f"Element subscripts must sum to 1.0 for a weighted fraction composition, got {sum(counts)}."
                                 )
                             )
 
