@@ -1,4 +1,4 @@
-# GSaPDef : Generic Sample and Profile Definitions
+# GSaPDef: Generic Sample and Profile Definitions
 
 `GSaPDef` is a simple and flexible framework for defining and working with generic sample/profile models in a scientific context in Python.
 
@@ -64,8 +64,5 @@ pip install gsapdef-<version>-py3-none-any.whl
 The documentation of this package is available via the markdown files in the `docs/` folder or by starting a local MkDocs server (requires `mkdocs`):
 
 ```bash
-pip install mkdocs mkdocs-material mkdocstrings[python]
 python -m mkdocs serve
 ```
-
-Opening the displayed local URL in a web browser will show the documentation.

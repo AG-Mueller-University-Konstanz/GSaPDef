@@ -11,6 +11,10 @@
 
 !docs/
 !docs/*
+!docs/api/
+!docs/api/*
+
+!mkdocs.yml
 
 !testing/
 !testing/*.py

@@ -55,12 +55,6 @@ class Formula(list[Component]):
     """
     A chemical formula consisting of elements and groups.
 
-    Attributes
-    ----------
-    components : List[Component]
-        The list of components (elements and groups) in the formula.
-        Inherited from typed list.
-
     Methods
     -------
     from_string(source: str) -> Result[Formula, Exception]
@@ -130,9 +124,6 @@ class Formula(list[Component]):
     def is_chem_valid(self) -> bool:
         """
         Check if the formula is chemically valid.
-        A formula is considered chemically valid if:
-        - All elements have subscripts that are positive integers.
-        - All groups are chemically valid recursively.
 
         Returns
         -------
@@ -142,6 +133,11 @@ class Formula(list[Component]):
         Notes
         -----
         This function only checks the validity of subscripts and group structure, given that the normal parsing allows for fractional subscripts to support mixed compounds.
+
+        A formula is considered chemically valid if:
+
+        - All elements have subscripts that are positive integers.
+        - All groups are chemically valid recursively.
         """
         for comp in self:
             if isinstance(comp, Element):
